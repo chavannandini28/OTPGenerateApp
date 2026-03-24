@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OTP Verification</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-primary">
+
+<div class="container w-50">
+  <div class="row">
+
+    <div class="col-12 col-md-6 p-5">
+      <h3 class="text-white"
+        style="border-left: 5px solid white; padding-left: 9px;">
+        OTP <br> VERIFICATION <br> JAVASCRIPT
+      </h3>
+    </div>
+
+    <div class="col-12 col-md-6 p-5">
+      <div class="container bg-light rounded p-4 text-center">
+
+        <p class="lead">Enter OTP Code</p>
+
+        <div class="d-flex justify-content-around mb-3">
+          <input type="text" maxlength="1" class="form-control text-center otp" id="d1">
+          <input type="text" maxlength="1" class="form-control text-center otp" id="d2">
+          <input type="text" maxlength="1" class="form-control text-center otp" id="d3">
+          <input type="text" maxlength="1" class="form-control text-center otp" id="d4">
+        </div>
+
+        <button class="btn btn-primary w-100 mb-2" id="verifyBtn" onclick="verifyOTP()" disabled>
+          Verify OTP
+        </button>
+
+        <button class="btn btn-secondary w-100 mb-2" onclick="generateOTP()">
+          Generate OTP
+        </button>
+
+        <p id="timer" class="text-danger fw-bold"></p>
+
+        <p id="message" class="fw-bold"></p>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+let otp = "";
+let timeLeft = 30;
+let timerInterval;
+
+function generateOTP(){
+  otp = String(1000 + Math.floor(Math.random() * 9000));
+  alert("Your OTP is: " + otp);
+
+  clearInputs();
+  document.getElementById('message').innerHTML = "";
+
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(timerInterval);
+  timeLeft = 30;
+
+  timerInterval = setInterval(() => {
+    document.getElementById('timer').innerHTML = "Expires in: " + timeLeft + "s";
+
+    if(timeLeft <= 0){
+      clearInterval(timerInterval);
+      otp = "";
+      document.getElementById('timer').innerHTML = "OTP Expired ❌";
+    }
+
+    timeLeft--;
+  }, 1000);
+}
+
+function verifyOTP(){
+  let userOTP = "";
+  document.querySelectorAll(".otp").forEach(input => {
+    userOTP += input.value;
+  });
+
+  let message = document.getElementById('message');
+
+  if(otp === ""){
+    message.innerHTML = "⚠️ Generate OTP first or OTP expired";
+    message.style.color = "orange";
+    return;
+  }
+
+  if(userOTP.length < 4){
+    message.innerHTML = "⚠️ Enter complete OTP";
+    message.style.color = "orange";
+    return;
+  }
+
+  if(userOTP === otp){
+    message.innerHTML = "✅ Verified Successfully";
+    message.style.color = "green";
+    otp = "";
+    clearInterval(timerInterval);
+    document.getElementById('timer').innerHTML = "";
+  } else {
+    message.innerHTML = "❌ Invalid OTP";
+    message.style.color = "red";
+  }
+
+  clearInputs();
+}
+
+function clearInputs(){
+  document.querySelectorAll(".otp").forEach(input => input.value = "");
+  document.getElementById('d1').focus();
+  document.getElementById('verifyBtn').disabled = true;
+}
+
+document.querySelectorAll(".otp").forEach((input, index, arr) => {
+
+  input.addEventListener("input", function(){
+    this.value = this.value.replace(/[^0-9]/g,'');
+
+    if(this.value && index < arr.length - 1){
+      arr[index + 1].focus();
+    }
+
+    checkEnableButton();
+  });
+
+  input.addEventListener("keydown", function(e){
+    if(e.key === "Backspace" && !this.value && index > 0){
+      arr[index - 1].focus();
+    }
+  });
+
+});
+
+function checkEnableButton(){
+  let filled = true;
+  document.querySelectorAll(".otp").forEach(input => {
+    if(input.value === "") filled = false;
+  });
+
+  document.getElementById('verifyBtn').disabled = !filled;
+}
+</script>
+
+</body>
+</html>
